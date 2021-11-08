@@ -7,14 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.dietApp.domain.board.Board;
 import com.cos.dietApp.domain.board.BoardRepository;
-import com.cos.dietApp.web.dto.PageReqDto;
 import com.cos.dietApp.web.dto.PageRespDto;
 
 import lombok.RequiredArgsConstructor;
@@ -24,17 +21,27 @@ import lombok.RequiredArgsConstructor;
 public class PagebleTest {
 	
 	private final BoardRepository boardRepository;
-	//@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
 	@GetMapping("/test/page")
-	public  Page<Board> test( ){
+	public  Page<Board> pageing(){
 		System.out.println("페이징 시작");
 		int page=1, menuId=1;
-		PageRequest pageRequest = PageRequest.of(page, 5, Sort.by("id").descending());
+		PageRequest pageRequest = PageRequest.of(page, 3, Sort.by("id").descending());
 		Page<Board> boardsEntity = boardRepository.findAll(pageRequest);
 		
-		//Page<Board> boardsEntity = boardRepository.findAll(menuId, pageRequest);
+	//	Page<Board> boardsEntity = boardRepository.mFindSearch(menuId, pageRequest);
+		
 		return boardsEntity;
 	}
+	
+	@GetMapping("/test/dpage")
+	public Page<Board> dpage() {
+		System.out.println("페이징 시작");
+		int page=1;
+		PageRequest pageRequest = PageRequest.of(page, 5, Sort.by("id").descending());
+		Page<Board> boardsEntity = boardRepository.findAll(pageRequest);
+		return boardsEntity;
+	}
+	
 
 	@GetMapping("/test/list")
 	public List<Board> list() {
@@ -50,7 +57,12 @@ public class PagebleTest {
 		int lastPage = (int) Math.ceil(totalcount / 10.0);
 		int prePage = pageten - 10;
 		int nextPage = pageten + 1;
-		PageRespDto pageRespDto = new PageRespDto (nowPage, lastPage, prePage, nextPage);
+		int endPage = nextPage - 1;
+		if(nextPage > lastPage) {
+			endPage = lastPage;
+		}
+		PageRespDto pageRespDto = new PageRespDto (nowPage, lastPage, prePage, nextPage, endPage);
+
 
 		return pageRespDto;
 	}
